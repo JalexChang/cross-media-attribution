@@ -42,13 +42,16 @@ class TestDataSet(unittest.TestCase):
         self.assertEqual(size_rating_train+size_rating_test , len(self.dataset.ratings.to_list()))
         self.assertEqual(train_dataset.touchs.matrix_shape(),test_dataset.touchs.matrix_shape())
 
-
     def test_kfolds(self):
         dataset_folds = Dataset.kfolds(self.dataset,n_folds=5)
         self.assertEqual(len(dataset_folds),5)
         for dataset_fold in dataset_folds:
             self.assertEqual(dataset_fold.matrix_shape(),self.dataset.matrix_shape())
-
+    
+    def test_append(self):
+        new_dataset = Dataset.append(self.dataset,self.dataset)
+        self.assertEqual(new_dataset.matrix_shape(),self.dataset.matrix_shape())
+        self.assertEqual( len(new_dataset.ratings.to_list()), 2*len(self.dataset.ratings.to_list()))
 
 if __name__ == '__main__' :
     unittest.main()

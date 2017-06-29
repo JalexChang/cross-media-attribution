@@ -66,6 +66,19 @@ class Dataset:
             dataset_folds.append(dataset_fold)
         return dataset_folds
 
+    @classmethod
+    def append(self,dataset_src1, dataset_src2):
+        if dataset_src1.matrix_shape() != dataset_src2.matrix_shape():
+            raise Exception("datasets' matrix shapes are not match")
+        matrix_shape = dataset_src1.matrix_shape()
+        touchs = numpy.copy(dataset_src1.touchs.to_list())
+        ratings = numpy.vstack((dataset_src1.ratings.to_list(), dataset_src2.ratings.to_list()))
+        return Dataset(ratings,touchs,matrix_shape)
+
+
+
+
+
 
 
 
