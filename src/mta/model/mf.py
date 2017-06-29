@@ -139,7 +139,7 @@ class MF:
         return total_cost
 
         
-    def predict(self):
+    def predict(self,test_dataset=None):
         R_predicted = numpy.dot(self.W,self.H)
         for u_id in range(self._size_user):
             for i_id in range(self._size_item):
