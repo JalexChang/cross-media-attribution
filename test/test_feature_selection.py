@@ -19,7 +19,9 @@ class TestFeatureSelection(unittest.TestCase):
         cv.load(self.dataset,self.model)
         cv.split(n_fold).run()
         scores = cv.score(metric.rmse)
-        self.assertEqual(scores.shape,(n_fold,n_fold))
+        self.assertEqual(len(scores),n_fold)
+        selected_model = cv.select(metric.rmse)
+        self.assertIsInstance(selected_model,SVD)
 
 if __name__ == '__main__' :
     unittest.main()

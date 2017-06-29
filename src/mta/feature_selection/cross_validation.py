@@ -7,9 +7,9 @@ from mta.dataset import Dataset
 class CrossValidation:
     def __init__(self, verbose = False):
         self.model = None
-        self.model_folds = None
+        self._model_folds = None
         self.dataset = None
-        self.datset_folds = None
+        self._datset_folds = None
         self.n_fold = 0
         self.verbose = verbose
 
@@ -23,39 +23,54 @@ class CrossValidation:
 
     def split(self,n_fold=5):
         self.n_fold = n_fold
-        self.dataset_folds = Dataset.kfolds(self.dataset,n_fold)
+        self._dataset_folds = Dataset.kfolds(self.dataset,n_fold)
         if self.verbose:
             print('split dataset into ',n_fold,' folds')
         return self
 
 
     def run(self):
-        if self.dataset_folds is not None:
-            self.model_folds = []
+        if self._dataset_folds is not None:
+            self._model_folds = []
             for fold_id in range(self.n_fold):
+                merged_dataset = self._merge_exclude(fold_id)
                 train_model = copy(self.model)
-                train_model.load_dataset(self.dataset_folds[fold_id])
+                train_model.load_dataset(merged_dataset)
                 train_model.fit()
-                self.model_folds.append(train_model)
+                self._model_folds.append(train_model)
                 if self.verbose:
                     print ('fold ',fold_id+1,' is trained')
 
+    def _merge_exclude(self,exclude_fold_id):
+        merged_dataset = None
+        for fold_id in range(self.n_fold):
+            if fold_id != exclude_fold_id:
+                if merged_dataset is not None:
+                    merged_dataset = Dataset.append(merged_dataset , self._dataset_folds[fold_id])
+                else :
+                    merged_dataset = self._dataset_folds[fold_id]
+        return merged_dataset
+
     def score(self,metirc_func):
-        score_matrix = numpy.zeros([self.n_fold,self.n_fold])
-        for dataset_id in range(len(self.dataset_folds)):
-            rating_list =  self.dataset_folds[dataset_id].ratings.to_list()    
-            for model_id in range(len(self.model_folds)):
-                predictions = self.model_folds[model_id].predict()
-                score_matrix[dataset_id][model_id] = metirc_func(rating_list,predictions)
+        scores = numpy.zeros(self.n_fold)
+        for fold_id in range(self.n_fold):
+            rating_list =  self._dataset_folds[fold_id].ratings.to_list() 
+            predictions = self._model_folds[fold_id].predict()
+            scores[fold_id] = metirc_func(rating_list,predictions)
         if self.verbose:
-            print('score table:')
-            
-            str_format=""
-            for model_id in range(len(self.model_folds)):
-                str_format += "%12.10s"
-            for dataset_id in range(len(self.dataset_folds)):
-                print(str_format % tuple(score_matrix[dataset_id]))
-        return score_matrix
+            print('scores: ',scores) 
+        return scores
+
+    def select(self,metirc_func):
+        scores = self.score(metirc_func)
+        min_score = min(scores)
+        best_fold_id = 0
+        for fold_id in range(self.n_fold):
+            if scores[fold_id] == min_score:
+                best_fold_id = fold_id
+                break
+        return copy(self._model_folds[best_fold_id])
+
 
 
 
