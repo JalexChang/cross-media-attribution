@@ -80,7 +80,7 @@ class Dataset:
 
     @classmethod
     def merge(self,datasets):
-        if len(datasets) <2 :
+        if len(datasets) <1 :
             raise Exception('length of datasets is less than 2')
         matrix_shape = datasets[0].matrix_shape()
         touchs = numpy.copy(datasets[0].touchs.to_list())
