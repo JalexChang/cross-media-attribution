@@ -40,6 +40,9 @@ class Dataset:
     def matrix_shape(self):
         return (self._size_user,self._size_factor,self._size_item)
     
+    def density(self):
+        return self.ratings.len / (self._size_user * self._size_item)
+
     @classmethod
     def train_test_split(self,dataset,test_size=0.2):
         matrix_shape = dataset.matrix_shape()
