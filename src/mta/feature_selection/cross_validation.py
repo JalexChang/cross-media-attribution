@@ -42,15 +42,18 @@ class CrossValidation:
                     print ('fold ',fold_id+1,' is trained')
 
     def _merge_exclude(self,exclude_fold_id):
-        merged_dataset = None
-        for fold_id in range(self.n_fold):
-            if fold_id != exclude_fold_id:
-                if merged_dataset is not None:
-                    merged_dataset = Dataset.append(merged_dataset , self._dataset_folds[fold_id])
-                else :
-                    merged_dataset = self._dataset_folds[fold_id]
-        return merged_dataset
+        merged_dataset_l = Dataset.merge(self._dataset_folds[:exclude_fold_id]) if len(self._dataset_folds[:exclude_fold_id])>0 else None
+        merged_dataset_r = Dataset.merge(self._dataset_folds[exclude_fold_id+1:]) if len(self._dataset_folds[exclude_fold_id+1:])>0 else None
 
+        merged_dataset = None;
+        if merged_dataset_l is None:
+            merged_dataset =  merged_dataset_r
+        elif merged_dataset_r is None:
+            merged_dataset =  merged_dataset_l;
+        else:
+            merged_dataset = Dataset.append(merged_dataset_l, merged_dataset_r)
+        return merged_dataset
+ 
     def score(self,metirc_func):
         scores = numpy.zeros(self.n_fold)
         for fold_id in range(self.n_fold):
