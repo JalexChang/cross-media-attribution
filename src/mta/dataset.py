@@ -78,6 +78,18 @@ class Dataset:
         ratings = numpy.vstack((dataset_src1.ratings.to_list(), dataset_src2.ratings.to_list()))
         return Dataset(ratings,touchs,matrix_shape)
 
+    @classmethod
+    def merge(self,datasets):
+        if len(datasets) <2 :
+            raise Exception('length of datasets is less than 2')
+        matrix_shape = datasets[0].matrix_shape()
+        touchs = numpy.copy(datasets[0].touchs.to_list())
+        ratings = numpy.copy(datasets[0].ratings.to_list())
+        for dataset in datasets[1:]:
+            ratings = numpy.vstack((ratings, dataset.ratings.to_list()))
+        return Dataset(ratings, touchs, matrix_shape)
+
+
 
 
 
