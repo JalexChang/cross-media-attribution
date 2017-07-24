@@ -27,6 +27,10 @@ class TestDataSet(unittest.TestCase):
         matrix_shape = self.dataset.matrix_shape()
         self.assertEqual(matrix_shape, (5,3,5))
 
+    def test_density(self):
+        density = self.dataset.density()
+        self.assertEqual(density,0.52)
+
     def test_init_with_martix_shape(self):
         new_ratings = numpy.copy(self.dataset.ratings.to_list())
         new_touchs = numpy.copy(self.dataset.touchs.to_list())
@@ -52,6 +56,7 @@ class TestDataSet(unittest.TestCase):
         new_dataset = Dataset.append(self.dataset,self.dataset)
         self.assertEqual(new_dataset.matrix_shape(),self.dataset.matrix_shape())
         self.assertEqual( len(new_dataset.ratings.to_list()), 2*len(self.dataset.ratings.to_list()))
+
 
 if __name__ == '__main__' :
     unittest.main()
