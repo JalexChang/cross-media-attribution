@@ -3,6 +3,7 @@ from copy import copy
 from mta.dataset import Dataset
 from mta.ds.rating_row import RatingRow
 from mta.ds.touch_row import TouchRow
+import time
 
 class MF:
     trained = False
@@ -62,6 +63,8 @@ class MF:
         min_cost = self._calculate_cost(R_list,R_predicted)
 
         for iters in range(self.max_iters):
+            begin_time = time.time()
+            
             R_predicted = self.predict()
             #update features by stochastic gradient descent
             self._update_sgd(R_list,R_predicted)          
@@ -72,8 +75,10 @@ class MF:
                 best_W = numpy.copy(self.W)
                 best_H = numpy.copy(self.H)
                 min_cost = total_cost
+            
+            end_time= time.time()
             if self.verbose :
-                    print ('iters-',iters+1,':',total_cost)
+                    print ('iters-',iters+1,' cost:',total_cost,' time:', end_time - begin_time)
             if total_cost < self.delta:
                 break
         #after training, chosse best factors
@@ -142,10 +147,11 @@ class MF:
         
     def predict(self,test_dataset=None):
         R_predicted = numpy.dot(self.W,self.H)
-        for u_id in range(self._size_user):
-            for i_id in range(self._size_item):
-                bias = self.mean + self.bias_user[u_id] + self.bias_item[i_id]
-                R_predicted[u_id][i_id]+=bias
+        if self.biased :
+            for u_id in range(self._size_user):
+                for i_id in range(self._size_item):
+                    bias = self.mean + self.bias_user[u_id] + self.bias_item[i_id]
+                    R_predicted[u_id][i_id]+=bias
         return R_predicted
 
     def matrix_shape(self):
