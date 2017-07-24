@@ -55,7 +55,13 @@ class TestDataSet(unittest.TestCase):
     def test_append(self):
         new_dataset = Dataset.append(self.dataset,self.dataset)
         self.assertEqual(new_dataset.matrix_shape(),self.dataset.matrix_shape())
-        self.assertEqual( len(new_dataset.ratings.to_list()), 2*len(self.dataset.ratings.to_list()))
+        self.assertEqual(len(new_dataset.ratings.to_list()), 2*len(self.dataset.ratings.to_list()))
+
+    def test_merge(self):
+        datasets = [self.dataset,self.dataset,self.dataset]
+        new_dataset = Dataset.merge(datasets)
+        self.assertEqual(new_dataset.matrix_shape(), self.dataset.matrix_shape())
+        self.assertEqual(len(new_dataset.ratings.to_list()), 3*len(self.dataset.ratings.to_list()))
 
 
 if __name__ == '__main__' :
