@@ -17,8 +17,6 @@ class Dataset:
 
     def _construct_matrix_shape(self,rating_rows,touch_rows,matrix_shape=None):
         if matrix_shape is None:
-            if max(rating_rows[:,0]) != max(touch_rows[:,0]):
-                raise Exception('different number of users in ratings and touchs')
             self._size_user = int(max(rating_rows[:,0]))+1
             self._size_item = int(max(rating_rows[:,1]))+1
             self._size_factor = int(max(touch_rows[:,1]))+1
