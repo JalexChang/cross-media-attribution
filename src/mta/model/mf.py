@@ -113,7 +113,7 @@ class MF:
         for u_id, i_id, rating in R_list:
             error = rating - R_predicted[u_id][i_id]
             for f_id in range(self._size_factor):
-                regu_term = self.beta * self.H[f_id][u_id]
+                regu_term = self.beta * self.H[f_id][i_id]
                 updated_H[f_id][i_id] += self.alpha * (error* self.W[u_id][f_id] + regu_term)
         return updated_H
 
