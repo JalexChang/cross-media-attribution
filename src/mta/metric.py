@@ -8,7 +8,16 @@ def rmse(rating_list,predicted_matrix):
     mean_squared_error = squared_error / len(rating_list)
     return sqrt(mean_squared_error)
 
-def hit_rate(rating_list,predicted_matrix,delta=0.1):
+def hit_rate_1(rating_list,predicted_matrix):
+	return _hit_rate(rating_list,predicted_matrix,delta=0.1)
+
+def hit_rate_2(rating_list,predicted_matrix):
+	return _hit_rate(rating_list,predicted_matrix,delta=0.2)
+
+def hit_rate_3(rating_list,predicted_matrix):
+	return _hit_rate(rating_list,predicted_matrix,delta=0.3)
+
+def _hit_rate(rating_list,predicted_matrix,delta=0.1):
     hits = 0
     for u_id, i_id ,rating in rating_list:
         abs_error = abs(rating - predicted_matrix[u_id][i_id])
