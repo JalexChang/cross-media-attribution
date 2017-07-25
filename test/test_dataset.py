@@ -12,11 +12,6 @@ class TestDataSet(unittest.TestCase):
     def test_init(self):
         self.assertIsInstance(self.dataset,Dataset)
 
-    def test_unconsistency_shape(self):
-        with self.assertRaises(Exception):
-            self.touchs = numpy.copy([[1,2],[0,0]])
-            self.dataset = Dataset(self.ratings,self.touchs)
-
     def test_invalid_data_format(self):
         with self.assertRaises(Exception):
             new_dataset = Dataset(ratings,ratings)
