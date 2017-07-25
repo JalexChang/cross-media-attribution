@@ -52,9 +52,9 @@ print ("rating table: ", rating.shape)
 print ("conversion table: ",conversion.shape)
 print ("effect table: ",effect.shape)
 
-numpy.savetxt(folder_name+"rating_table.csv",rating,delimiter=',', fmt ='%.4f')
-numpy.savetxt(folder_name+"effect_table.csv",effect,delimiter=',', fmt ='%.4f')
-numpy.savetxt(folder_name+"conversion_table.csv",conversion,delimiter=',', fmt ='%.4f')
+numpy.savetxt(folder_name+"rating_table.csv",rating,delimiter=',', fmt ='%.8f')
+numpy.savetxt(folder_name+"effect_table.csv",effect,delimiter=',', fmt ='%.8f')
+numpy.savetxt(folder_name+"conversion_table.csv",conversion,delimiter=',', fmt ='%.8f')
 
 f = open(folder_name+"rating_list.csv","w")
 for i in range(len(rating)):
