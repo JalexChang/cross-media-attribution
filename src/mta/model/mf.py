@@ -25,7 +25,6 @@ class MF:
         self.ratings = copy(dataset.ratings)
         self.touchs = copy(dataset.touchs)
         self.dataset_loaded = True
-        self.trained = False
         if self.verbose:
             print('dataset:', matrix_shape, ' is loaded')
 
