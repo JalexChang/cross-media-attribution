@@ -9,7 +9,7 @@ class RatingRow:
         for index in range(self.len):
             self._user_ids.append(int(rows[index][0]))
             self._item_ids.append(int(rows[index][1]))
-            self._ratings.append(rows[index][2])
+            self._ratings.append(float(rows[index][2]))
         self._size_user = int(matrix_shape[0])
         self._size_item = int(matrix_shape[1])
 
