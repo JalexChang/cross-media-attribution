@@ -29,11 +29,14 @@ class TestMetric(unittest.TestCase):
         self.assertTrue(mape <= 40.)
 
     def test_hit_rate(self):
-        hit_rate_1 = metric.hit_rate(self.rating_list, self.predicted_matrix,delta=0.1)
-        hit_rate_2 = metric.hit_rate(self.rating_list, self.predicted_matrix,delta=0.2)
+        hit_rate_1 = metric.hit_rate_1(self.rating_list, self.predicted_matrix)
+        hit_rate_2 = metric.hit_rate_2(self.rating_list, self.predicted_matrix)
+        hit_rate_3 = metric.hit_rate_3(self.rating_list, self.predicted_matrix)
         self.assertIsInstance(hit_rate_1,float)
         self.assertIsInstance(hit_rate_2,float)
+        self.assertIsInstance(hit_rate_3,float)
         self.assertTrue(hit_rate_1 <= hit_rate_2)
+        self.assertTrue(hit_rate_2 <= hit_rate_3)
 
 if __name__ == '__main__' :
     unittest.main()
