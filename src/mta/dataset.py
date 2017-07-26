@@ -17,16 +17,16 @@ class Dataset:
 
     def _construct_matrix_shape(self,rating_rows,touch_rows,matrix_shape=None):
         if matrix_shape is None:
-            self._size_user = int(max(rating_rows[:,0]))+1
-            self._size_item = int(max(rating_rows[:,1]))+1
-            self._size_factor = int(max(touch_rows[:,1]))+1
+            self._size_user = int(max(list( int(rating[0]) for rating in rating_rows )))+1
+            self._size_item = int(max(list( int(rating[1]) for rating in rating_rows )))+1
+            self._size_factor = int(max(list( int(touch[1]) for touch in touch_rows )))+1
         else:
             self._size_user = matrix_shape[0]
             self._size_factor = matrix_shape[1]
             self._size_item = matrix_shape[2]
 
     def _construct_ratings(self,rows):
-        if len(rows[0]) !=3 :
+        if len(rows[0]) <3 :
             raise Exception('invalid data format when construct ratings') 
         self.ratings = RatingRow(rows,(self._size_user,self._size_item))
         
