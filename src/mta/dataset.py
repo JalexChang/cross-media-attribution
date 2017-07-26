@@ -1,4 +1,5 @@
 import numpy
+import math
 from mta.ds.touch_row import TouchRow
 from mta.ds.rating_row import RatingRow
 from copy import copy
@@ -40,6 +41,16 @@ class Dataset:
     
     def density(self):
         return self.ratings.len / (self._size_user * self._size_item)
+
+    def rating_dist(self,stacks=10):
+        rating_range = max(self.ratings.to_matrix().flat)
+        stack_range = rating_range/(stacks-1)
+        dist = numpy.zeros(stacks)
+        rating_list = self.ratings.to_list()
+        for u_id, i_id, rating in rating_list:
+            index = math.floor(rating/stack_range)
+            dist[index] +=1
+        return dist
 
     @classmethod
     def train_test_split(self,dataset,test_size=0.2):
