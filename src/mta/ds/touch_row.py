@@ -32,7 +32,7 @@ class TouchRow:
         return touch_list
 
     def to_matrix(self):
-        matrix = numpy.zeros(self.matrix_shape())
+        matrix = numpy.zeros(self.matrix_shape(), dtype=int)
         for index in range(self.len):
             user_id = self._user_ids[index]
             factor_id = self._factor_ids[index]
