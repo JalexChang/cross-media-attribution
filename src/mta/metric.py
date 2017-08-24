@@ -4,7 +4,7 @@ import numpy
 def rmse(rating_list,predicted_matrix):
     squared_error = 0.
     for u_id, i_id ,rating in rating_list:
-        squared_error =+ pow(rating - predicted_matrix[u_id][i_id],2)
+        squared_error += pow(rating - predicted_matrix[u_id][i_id],2)
     mean_squared_error = squared_error / len(rating_list)
     return sqrt(mean_squared_error)
 
