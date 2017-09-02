@@ -5,28 +5,23 @@ from mta.ds.rating_row import RatingRow
 class TestMetric(unittest.TestCase):
     
     def setUp(self):
-        ratings = numpy.loadtxt('cust_ratings',delimiter=',')
-        ratings = RatingRow(ratings,[max(ratings[:,0])+1,max(ratings[:,1])+1])
-        predicted_ratings = numpy.loadtxt('cust_predicted_ratings',delimiter=',')
-        predicted_ratings = RatingRow(predicted_ratings,[max(predicted_ratings[:,0])+1,max(predicted_ratings[:,1])+1])
-
-        self.rating_list = ratings.to_list()
-        self.predicted_matrix = predicted_ratings.to_matrix()
+        self.rating_list = [(0,0,1.),(1,1,1.),(0,1,0.5),(1,0,1.5)]
+        self.predicted_matrix = numpy.array([[1.2,0.7],[1.2,0.7]])
 
     def test_rmse(self):
         rmse = metric.rmse(self.rating_list, self.predicted_matrix)
         self.assertIsInstance(rmse,float)
-        self.assertTrue(rmse <= 0.1)
+        self.assertTrue(rmse <= 0.26)
 
     def test_mae(self):
         mae = metric.mae(self.rating_list, self.predicted_matrix)
         self.assertIsInstance(mae,float)
-        self.assertTrue(mae <= 1.)
+        self.assertTrue(mae == 0.25)
 
     def test_mape(self):
         mape = metric.mape(self.rating_list, self.predicted_matrix)
         self.assertIsInstance(mape,float)
-        self.assertTrue(mape <= 40.)
+        self.assertTrue(mape <= 27.55)
 
     def test_hit_rate(self):
         hit_rate_1 = metric.hit_rate_1(self.rating_list, self.predicted_matrix)
