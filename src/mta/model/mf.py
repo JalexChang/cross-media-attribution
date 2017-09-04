@@ -25,6 +25,8 @@ class MF:
         self.ratings = copy(dataset.ratings)
         self.touchs = copy(dataset.touchs)
         self.dataset_loaded = True
+        if not self.trained :
+            self.trained_matrix = numpy.zeros(self.ratings.matrix_shape(), dtype=bool)
         if self.verbose:
             print('dataset:', matrix_shape, ' is loaded')
 
@@ -45,26 +47,30 @@ class MF:
             self.bias_item = numpy.zeros(self._size_item)
             if self.biased:
                 self.mean = self.ratings.mean()
-                for u_id in range(len(self.bias_user)):
-                    self.bias_user[u_id] = numpy.random.random() if max(R[u_id,:]) > 0 else 0 
+                #for u_id in range(len(self.bias_user)):
+                    #self.bias_user[u_id] = numpy.random.random() if max(R[u_id,:]) > 0 else 0 
                 for i_id in range(len(self.bias_item)):
                     self.bias_item[i_id] = numpy.random.random() if max(R[:,i_id]) > 0 else 0
                 if self.verbose:
                     print('biases has been initialized')
- 
+    
+    def _mark_matrix(self):
+        for u_id, i_id, rating in self.ratings.to_list():
+            self.trained_matrix[u_id][i_id]=True
+
     def fit(self):
         self._init_latent_factors()
-        self._init_biases()      
+        self._init_biases()
+        self._mark_matrix()      
         best_W = numpy.copy(self.W)
         best_H = numpy.copy(self.H)
         R_list = self.ratings.to_list()
-        R_predicted = self.predict()
+        R_predicted = self.predict(R_list)
         min_cost = self._calculate_cost(R_list,R_predicted)
-
         for iters in range(self.max_iters):
             begin_time = time.time()
             
-            R_predicted = self.predict()
+            R_predicted = self.predict(R_list)
             #update features by stochastic gradient descent
             self._update_sgd(R_list,R_predicted)          
             #calculate overall error (with regularization)
@@ -84,7 +90,7 @@ class MF:
         self.W = best_W
         self.H = best_H
         self.trained = True
-                    
+        
     def _update_sgd(self,R_list,R_predicted):
         #updated factors
         updated_W = self._calculate_updated_W(R_list,R_predicted)
@@ -93,9 +99,9 @@ class MF:
         self.H = updated_H
         #update biases
         if self.biased:
-            updated_bias_user = self._calculate_updated_bias_user(R_list,R_predicted)
+            #updated_bias_user = self._calculate_updated_bias_user(R_list,R_predicted)
             updated_bias_item = self._calculate_updated_bias_item(R_list,R_predicted)
-            self.bias_user = updated_bias_user
+            #self.bias_user = updated_bias_user
             self.bias_item = updated_bias_item
 
     def _calculate_updated_W(self,R_list,R_predicted):
@@ -143,35 +149,72 @@ class MF:
             total_cost += self.beta*(numpy.dot(self.H[:,i_id].flat,self.H[:,i_id].flat) + pow(self.bias_item[i_id],2))
         return total_cost
 
-        
-    def predict(self,test_dataset=None):
-        R_predicted = numpy.dot(self.W,self.H)
-        if self.biased :
+    def predict(self, R_list = None):
+        return self._predict(R_list, "normal")
+
+    def predict_average(self, R_list = None):
+        return self._predict(R_list, "avg")
+
+    def _predict(self, R_list = None, p_type ="normal"):
+        R_predicted = numpy.zeros((self._size_user,self._size_item))
+        if R_list is None:
             for u_id in range(self._size_user):
-                for i_id in range(self._size_item):
-                    bias = self.mean + self.bias_user[u_id] + self.bias_item[i_id]
-                    R_predicted[u_id][i_id]+=bias
+                for i_id in range(self._size_item): 
+                    R_predicted[u_id][i_id] = self._predict_one_element(u_id, i_id, p_type)    
+        else:
+            for u_id, i_id, rating in R_list:
+                R_predicted[u_id][i_id] = self._predict_one_element(u_id, i_id, p_type)
         return R_predicted
+
+
+    def _predict_one_element(self, u_id, i_id, p_type ="normal"):
+        predicted_element = 0.
+        if p_type == "normal":
+            predicted_element = numpy.dot(self.W[u_id,:], self.H[:,i_id])
+        elif  p_type == "avg" :
+            predicted_w = self.average_w(u_id, i_id)
+            predicted_element = numpy.dot(predicted_w, self.H[:,i_id])
+        else:
+            return predicted_element
+        if self.biased :
+            predicted_element += self.mean + self.bias_user[u_id] + self.bias_item[i_id]
+        return predicted_element
+
+    def average_w(self, u_id, i_id):
+        users = []
+        w = numpy.zeros(self._size_factor)
+        for user_id in range(len(self.trained_matrix)):
+            if self.trained_matrix[user_id][i_id]:
+                users.append(user_id)
+                w += self.W[user_id]
+        for f_id in range(self._size_factor):
+            if len(users) >0:
+                w[f_id] = w[f_id]/ len(users) if self.W[u_id][f_id] >0 else 0
+        return w
 
     def matrix_shape(self):
         return (self._size_user,self._size_factor,self._size_item)
 
-    def factor_attribution(self):
+    def factor_attribution(self, R_list = None):
         attribution = numpy.zeros(self._size_factor)
-        attribution_matrix = self.factor_item_attribution()
+        attribution_matrix = self.factor_item_attribution(R_list)
         for f_id in range(self._size_factor):
             attribution[f_id] = attribution_matrix[f_id].sum()
         return attribution
 
-    def factor_item_attribution(self):
+    def factor_item_attribution(self, R_list = None):
         attribution_matrix = numpy.zeros([self._size_factor,self._size_item])
-        #factor_value =numpy.zeros(self._size_factor)
-        R_list = self.ratings.to_list()
         R_predicted = self.predict()
-        for u_id, i_id, rating in R_list:
-            for f_id in range(self._size_factor):
-                weight_percent = (self.W[u_id][f_id] * self.H[f_id][i_id]) / R_predicted[u_id][i_id]
-                attribution_matrix[f_id][i_id] += rating * weight_percent
+        if R_list is not None:
+            for u_id, i_id, rating in R_list:
+                for f_id in range(self._size_factor):
+                    weight_percent = (self.W[u_id][f_id] * self.H[f_id][i_id]) / R_predicted[u_id][i_id]
+                    attribution_matrix[f_id][i_id] += rating * weight_percent
+        else:
+            for u_id in range(self._size_user):
+                for i_id in range(self._size_item):
+                    for f_id in range(self._size_factor):
+                        attribution_matrix[f_id][i_id] += self.W[u_id][f_id] * self.H[f_id][i_id]  
         return attribution_matrix
 
 

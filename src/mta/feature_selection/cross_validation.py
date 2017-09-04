@@ -31,15 +31,21 @@ class CrossValidation:
 
     def run(self):
         if self._dataset_folds is not None:
-            self._model_folds = []
-            for fold_id in range(self.n_fold):
-                merged_dataset = self._merge_exclude(fold_id)
-                train_model = copy(self.model)
-                train_model.load_dataset(merged_dataset)
-                train_model.fit()
-                self._model_folds.append(train_model)
-                if self.verbose:
-                    print ('fold ',fold_id+1,' is trained')
+            if self._model_folds is None:
+                self._model_folds = []
+                for fold_id in range(self.n_fold):
+                    merged_dataset = self._merge_exclude(fold_id)
+                    train_model = copy(self.model)
+                    train_model.load_dataset(merged_dataset)
+                    train_model.fit()
+                    self._model_folds.append(train_model)
+                    if self.verbose:
+                        print ('fold ',fold_id+1,' is trained')
+            else:
+                for fold_id in range(self.n_fold):
+                    self._model_folds[fold_id].fit()
+                    if self.verbose:
+                        print ('fold ',fold_id+1,' is trained')
 
     def _merge_exclude(self,exclude_fold_id):
         merged_dataset_l = Dataset.merge(self._dataset_folds[:exclude_fold_id]) if len(self._dataset_folds[:exclude_fold_id])>0 else None
@@ -55,14 +61,28 @@ class CrossValidation:
         return merged_dataset
  
     def score(self,metirc_func):
+        return self._score(metirc_func, "normal")
+
+    def score_avg(self,metirc_func):
+        return self._score(metirc_func, "avg")
+
+    def _score(self, metirc_func, score_type="normal"):
         scores = numpy.zeros(self.n_fold)
         for fold_id in range(self.n_fold):
-            rating_list =  self._dataset_folds[fold_id].ratings.to_list() 
-            predictions = self._model_folds[fold_id].predict()
+            rating_list =  self._dataset_folds[fold_id].ratings.to_list()
+            predictions = self._get_predictions(fold_id, rating_list, score_type)
             scores[fold_id] = metirc_func(rating_list,predictions)
         if self.verbose:
             print('scores: ',scores) 
         return scores
+
+    def _get_predictions(self, fold_id, rating_list, score_type="normal"):
+        predictions = numpy.zeros(self.dataset.matrix_shape())
+        if score_type == "normal":
+            predictions = self._model_folds[fold_id].predict(rating_list)
+        elif score_type =="avg":
+            predictions = self._model_folds[fold_id].predict_average(rating_list)
+        return predictions
 
     def select(self,metirc_func):
         scores = self.score(metirc_func)
