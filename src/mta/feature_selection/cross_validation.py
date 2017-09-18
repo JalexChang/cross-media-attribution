@@ -1,5 +1,6 @@
 import numpy
 from copy import copy
+import time
 from mta.model import *
 from mta.dataset import Dataset
 
@@ -69,20 +70,20 @@ class CrossValidation:
     def _score(self, metirc_func, score_type="normal"):
         scores = numpy.zeros(self.n_fold)
         for fold_id in range(self.n_fold):
+            begin_time = time.time()
             rating_list =  self._dataset_folds[fold_id].ratings.to_list()
             predictions = self._get_predictions(fold_id, rating_list, score_type)
             scores[fold_id] = metirc_func(rating_list,predictions)
-        if self.verbose:
-            print('scores: ',scores) 
+            end_time = time.time()
+            if self.verbose:
+                print('scored fold',fold_id,'in', str(end_time - begin_time)) 
         return scores
 
     def _get_predictions(self, fold_id, rating_list, score_type="normal"):
-        predictions = numpy.zeros(self.dataset.matrix_shape())
         if score_type == "normal":
-            predictions = self._model_folds[fold_id].predict(rating_list)
+            return self._model_folds[fold_id].predict(rating_list)
         elif score_type =="avg":
-            predictions = self._model_folds[fold_id].predict_average(rating_list)
-        return predictions
+            return self._model_folds[fold_id].predict_average(rating_list)
 
     def select(self,metirc_func):
         scores = self.score(metirc_func)
