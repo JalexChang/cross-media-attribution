@@ -1,4 +1,5 @@
 import numpy
+import statistics
 
 class RatingRow:
     def __init__(self,rows,matrix_shape):
@@ -35,7 +36,10 @@ class RatingRow:
         return (self._size_user,self._size_item)
 
     def mean(self):
-        return sum(self._ratings)/self.len
+        return statistics.mean(self._ratings)
+
+    def std(self):
+        return statistics.stdev(self._ratings)
 
     def range(self):
         return max(self._ratings)-min(self._ratings)
