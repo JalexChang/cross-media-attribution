@@ -30,10 +30,12 @@ class NMF(MF):
                     H_demon[f_id][i_id] += self.W[u_id][f_id] * predicted_rating
                     H_elements[i_id] +=1
             #update biases
-            if self.biased:
-                error = rating - predicted_rating
-                #self.bias_user[u_id] += self.alpha *( error - self.beta * self.bias_user[u_id])
+            error = rating - predicted_rating
+            if self.item_biased: 
                 self.bias_item[i_id] += self.alpha *( error - self.beta * self.bias_item[i_id])
+            if self.user_biased:
+                self.bias_user[u_id] += self.alpha *( error - self.beta * self.bias_user[u_id])
+
         #updated factors
         for u_id in range(self._size_user):
             for f_id in range(self._size_factor):

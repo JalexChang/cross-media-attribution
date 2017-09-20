@@ -9,9 +9,10 @@ class MF:
     trained = False
     dataset_loaded = False
 
-    def __init__ (self,max_iters=100, biased =False, alpha=0.001, beta=0.01, delta=0.001,verbose=False):
+    def __init__ (self,max_iters=100, user_biased =False, item_biased =False, alpha=0.001, beta=0.01, delta=0.001,verbose=False):
         self.max_iters = max_iters
-        self.biased = biased
+        self.user_biased = user_biased
+        self.item_biased = item_biased
         self.alpha = alpha
         self.beta = beta
         self.delta = delta
@@ -47,7 +48,7 @@ class MF:
             self.mean = 0
             self.bias_user = numpy.zeros(self._size_user)
             self.bias_item = numpy.zeros(self._size_item)
-            if self.biased:
+            if self.user_biased or self.item_biased:
                 self.mean = self.ratings.mean()
                 if self.verbose:
                     print('biases has been initialized')
@@ -91,9 +92,10 @@ class MF:
                     self.W[u_id][f_id] += self.alpha *(error * h_fi + self.beta * w_uf)
                     self.H[f_id][i_id] += self.alpha *(error * w_uf + self.beta * h_fi)
             #update biases
-            if self.biased:
-                #self.bias_user[u_id] += self.alpha *( error - self.beta * self.bias_user[u_id])
+            if self.item_biased:
                 self.bias_item[i_id] += self.alpha *( error - self.beta * self.bias_item[i_id])
+            if self.user_biased:
+                self.bias_user[u_id] += self.alpha *( error - self.beta * self.bias_user[u_id])
 
     def _calculate_cost(self,R_list,R_predicted): 
         total_cost =0.
@@ -133,10 +135,7 @@ class MF:
         elif  p_type == "avg" :
             predicted_w = self.average_w(u_id, i_id)
             predicted_element = numpy.dot(predicted_w, self.H[:,i_id])
-        else:
-            return predicted_element
-        if self.biased :
-            predicted_element += self.mean + self.bias_user[u_id] + self.bias_item[i_id]
+        predicted_element += self.mean + self.bias_user[u_id] + self.bias_item[i_id]
         return predicted_element
 
     def average_w(self, u_id, i_id):
