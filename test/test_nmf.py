@@ -33,21 +33,26 @@ class TestNMF(unittest.TestCase):
     def test_fit(self):
         self.model.fit()
         predict_rating = self.model.predict()
+        print(self.dataset.ratings.to_matrix())
+        print(predict_rating)
         rmse = metric.rmse(self.dataset.ratings.to_list(),predict_rating)
+        print("rmse", rmse)
         self.assertTrue(rmse <= 1.)
 
     def test_factor_item_attribution(self):
         self.model.fit()
         rating_matrix = numpy.array(self.dataset.ratings.to_matrix())
-        attribution_matrix = self.model.factor_item_attribution()
+        attribution_matrix = self.model.factor_item_attribution(self.dataset.ratings.to_list())
         error = rating_matrix.sum() - attribution_matrix.sum() 
+        print("error on factor_item_attribution",error)
         self.assertTrue(error <= 0.0000001)
 
     def test_factor_attribution(self):
         self.model.fit()
         rating_matrix = numpy.array(self.dataset.ratings.to_matrix())
-        attribution = self.model.factor_attribution()
+        attribution = self.model.factor_attribution(self.dataset.ratings.to_list())
         error = rating_matrix.sum() - attribution.sum() 
+        print("error on factor_attribution",error)
         self.assertTrue(error <= 0.0000001)
 
 if __name__ == '__main__' :

@@ -25,12 +25,7 @@ class TestDataSet(unittest.TestCase):
     def test_density(self):
         density = self.dataset.density()
         self.assertEqual(density,0.52)
-    def test_rating_dist(self):
-        dist = self.dataset.rating_dist(5)
-        print(dist)
-        self.assertEqual(len(dist), 5)
-
-
+ 
     def test_init_with_martix_shape(self):
         new_ratings = numpy.copy(self.dataset.ratings.to_list())
         new_touchs = numpy.copy(self.dataset.touchs.to_list())
