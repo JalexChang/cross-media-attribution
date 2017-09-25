@@ -27,7 +27,9 @@ class MF:
         self.touchs = copy(dataset.touchs)
         self.dataset_loaded = True
         if not self.trained :
-            self.trained_matrix = numpy.zeros(self.ratings.matrix_shape(), dtype=bool)
+            self.trained_transaction_on_item = []
+            for i_id in range(self._size_item):
+                self.trained_transaction_on_item.append([])
         if self.verbose:
             print('dataset:', matrix_shape, ' is loaded')
 
@@ -55,7 +57,7 @@ class MF:
     
     def _mark_matrix(self):
         for u_id, i_id, rating in self.ratings.to_list():
-            self.trained_matrix[u_id][i_id]=True
+            self.trained_transaction_on_item[i_id].append(u_id)
 
     def fit(self):
         self._init_biases()
@@ -139,15 +141,14 @@ class MF:
         return predicted_element
 
     def average_w(self, u_id, i_id):
-        users = []
+        users = self.trained_transaction_on_item[i_id]
+        len_user = len(users)
         w = numpy.zeros(self._size_factor)
-        for user_id in range(len(self.trained_matrix)):
-            if self.trained_matrix[user_id][i_id]:
-                users.append(user_id)
+        if len_user >0:
+            for user_id in users:
                 w += self.W[user_id]
-        for f_id in range(self._size_factor):
-            if len(users) >0:
-                w[f_id] = w[f_id]/ len(users) if self.W[u_id][f_id] >0 else 0
+            for f_id in range(self._size_factor):
+                w[f_id] = w[f_id]/ len_user if self.W[u_id][f_id] >0 else 0
         return w
 
     def matrix_shape(self):
