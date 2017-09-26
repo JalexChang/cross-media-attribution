@@ -2,6 +2,8 @@ import numpy
 import math
 from mta.ds.touch_row import TouchRow
 from mta.ds.rating_row import RatingRow
+from datetime import datetime
+from datetime import timedelta
 from copy import copy
 
 
@@ -67,6 +69,29 @@ class Dataset:
             dataset_fold = Dataset(rating_fold,touchs,matrix_shape)
             dataset_folds.append(dataset_fold)
         return dataset_folds
+
+    @classmethod
+    def split_by_time_range(slef,dataset,time_range=timedelta(days=7)):
+        ratings = dataset.ratings.to_list()
+        touchs = dataset.touchs.to_list()
+        matrix_shape = dataset.matrix_shape()
+        time_base = ratings[0][3] + time_range
+        ratings_set = []
+        datasets = []
+        low_bound =0
+        
+        for high_bound  in range(len(ratings)):
+            now_date = ratings[high_bound][3]
+            if now_date >= time_base:
+                ratings_set.append(ratings[low_bound : high_bound])
+                low_bound = high_bound
+                time_base+= time_range
+        if low_bound <= len(ratings)-1:
+            ratings_set.append(ratings[low_bound:len(ratings)])
+
+        for rating in ratings_set:
+            datasets.append(Dataset(rating,touchs,matrix_shape))
+        return datasets
 
     @classmethod
     def append(self,dataset_src1, dataset_src2):

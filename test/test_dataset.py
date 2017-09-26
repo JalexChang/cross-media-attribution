@@ -1,6 +1,9 @@
 import numpy
 import unittest
 from mta.dataset import Dataset
+import mta.utility as utility
+from datetime import timedelta
+
 
 class TestDataSet(unittest.TestCase):
 
@@ -47,6 +50,14 @@ class TestDataSet(unittest.TestCase):
         for dataset_fold in dataset_folds:
             self.assertEqual(dataset_fold.matrix_shape(),self.dataset.matrix_shape())
     
+    def test_split_by_time_range(self):
+        ratings = utility.load_rating_file("cust_ratings_with_datetime")
+        dataset = Dataset(ratings, self.touchs)
+        dataset_folds = Dataset.split_by_time_range(dataset,time_range=timedelta(1))
+        self.assertEqual(len(dataset_folds),5)
+        for dataset_fold in dataset_folds:
+            self.assertEqual(dataset_fold.matrix_shape(),dataset.matrix_shape())
+
     def test_append(self):
         new_dataset = Dataset.append(self.dataset,self.dataset)
         self.assertEqual(new_dataset.matrix_shape(),self.dataset.matrix_shape())

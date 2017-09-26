@@ -6,11 +6,14 @@ class RatingRow:
         self._user_ids = []
         self._item_ids = []
         self._ratings = [] 
+        self._datatime =[]
         self.len = len(rows)
         for index in range(self.len):
             self._user_ids.append(int(rows[index][0]))
             self._item_ids.append(int(rows[index][1]))
             self._ratings.append(float(rows[index][2]))
+            if len(rows[index]) ==4:
+                self._datatime.append(rows[index][3])
         self._size_user = int(matrix_shape[0])
         self._size_item = int(matrix_shape[1])
 
@@ -20,7 +23,10 @@ class RatingRow:
             user_id = self._user_ids[index]
             item_id = self._item_ids[index]
             rating = self._ratings[index]
-            rating_list.append([user_id,item_id,rating])
+            if len(self._datatime) ==0 :
+                rating_list.append([user_id,item_id,rating])
+            else :
+                rating_list.append([user_id,item_id,rating, self._datatime[index]])
         return rating_list
 
     def to_matrix(self):
