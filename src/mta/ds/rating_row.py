@@ -17,16 +17,17 @@ class RatingRow:
         self._size_user = int(matrix_shape[0])
         self._size_item = int(matrix_shape[1])
 
-    def to_list(self):
+    def to_list(self,with_datetime=False):
         rating_list = []
         for index in range(self.len):
             user_id = self._user_ids[index]
             item_id = self._item_ids[index]
             rating = self._ratings[index]
-            if len(self._datatime) ==0 :
-                rating_list.append([user_id,item_id,rating])
-            else :
+            if with_datetime is True and len(self._datatime) >0 :
                 rating_list.append([user_id,item_id,rating, self._datatime[index]])
+            else :
+                rating_list.append([user_id,item_id,rating])
+                
         return rating_list
 
     def to_matrix(self):

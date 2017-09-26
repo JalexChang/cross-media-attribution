@@ -58,6 +58,10 @@ class TestDataSet(unittest.TestCase):
         for dataset_fold in dataset_folds:
             self.assertEqual(dataset_fold.matrix_shape(),dataset.matrix_shape())
 
+    def test_split_by_time_range_exception(self):
+        with self.assertRaises(Exception):
+            dataset_folds = Dataset.split_by_time_range(self.dataset,time_range=timedelta(1))
+
     def test_append(self):
         new_dataset = Dataset.append(self.dataset,self.dataset)
         self.assertEqual(new_dataset.matrix_shape(),self.dataset.matrix_shape())

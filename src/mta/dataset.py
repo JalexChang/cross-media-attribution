@@ -72,7 +72,9 @@ class Dataset:
 
     @classmethod
     def split_by_time_range(slef,dataset,time_range=timedelta(days=7)):
-        ratings = dataset.ratings.to_list()
+        ratings = dataset.ratings.to_list(with_datetime=True)
+        if len(ratings[0]) < 4 :
+            raise Exception("the dataset does not contain datetime")
         touchs = dataset.touchs.to_list()
         matrix_shape = dataset.matrix_shape()
         time_base = ratings[0][3] + time_range
