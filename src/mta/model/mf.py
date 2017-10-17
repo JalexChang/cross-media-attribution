@@ -164,16 +164,11 @@ class MF:
     def factor_item_attribution(self, R_list = None):
         attribution_matrix = numpy.zeros([self._size_factor,self._size_item])
         R_predicted = self.predict()
-        if R_list is not None:
-            for u_id, i_id, rating in R_list:
-                for f_id in range(self._size_factor):
-                    weight_percent = (self.W[u_id][f_id] * self.H[f_id][i_id]) / R_predicted[u_id][i_id]
-                    attribution_matrix[f_id][i_id] += rating * weight_percent
-        else:
-            for u_id in range(self._size_user):
-                for i_id in range(self._size_item):
-                    for f_id in range(self._size_factor):
-                        attribution_matrix[f_id][i_id] += self.W[u_id][f_id] * self.H[f_id][i_id]  
+        if R_list is None:
+            R_list = self.ratings.to_list() 
+        for u_id, i_id, rating in R_list:
+            for f_id in range(self._size_factor):
+                total_weight = R_predicted[u_id][i_id] -self.mean -self.bias_user[u_id] -self.bias_item[i_id]
+                attributed_weight = self.W[u_id][f_id] * self.H[f_id][i_id] 
+                attribution_matrix[f_id][i_id] += rating * (attributed_weight / total_weight)
         return attribution_matrix
-
-
