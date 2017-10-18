@@ -169,6 +169,7 @@ class MF:
         for u_id, i_id, rating in R_list:
             for f_id in range(self._size_factor):
                 total_weight = R_predicted[u_id][i_id] -self.mean -self.bias_user[u_id] -self.bias_item[i_id]
-                attributed_weight = self.W[u_id][f_id] * self.H[f_id][i_id] 
-                attribution_matrix[f_id][i_id] += rating * (attributed_weight / total_weight)
+                attributed_weight = self.W[u_id][f_id] * self.H[f_id][i_id]
+                if total_weight > 0.:
+                    attribution_matrix[f_id][i_id] += rating * (attributed_weight / total_weight)
         return attribution_matrix
