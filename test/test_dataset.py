@@ -36,6 +36,12 @@ class TestDataSet(unittest.TestCase):
         new_dataset = Dataset(new_ratings,new_touchs,new_matrix_shape)
         self.assertIsInstance(new_dataset,Dataset)
 
+    def test_seperate_rating_item_by_item(self):
+        rating_set , touch_set = self.dataset.seperate_rating_touch_by_item()
+        self.assertEqual(len(rating_set), len(touch_set))
+        for i_id in range(len(rating_set)):
+            self.assertEqual(len(rating_set[i_id]), len(touch_set[i_id]))
+
     def test_train_test_split(self):
         train_dataset,test_dataset = Dataset.train_test_split(self.dataset,test_size=0.5)
         self.assertEqual(train_dataset.matrix_shape(),test_dataset.matrix_shape())

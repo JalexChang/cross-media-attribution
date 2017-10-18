@@ -44,6 +44,22 @@ class Dataset:
     def density(self):
         return self.ratings.len / (self._size_user * self._size_item)
 
+    #convert dataset into reresion datasets seperated by item_id  
+    def seperate_rating_touch_by_item(self):
+        size_item = self.ratings.matrix_shape()[1]
+        touch_matrix = self.touchs.to_matrix()
+        rating_set = []
+        touch_set= []
+        for i_id in range(size_item):
+            rating_set.append([])
+            touch_set.append([])
+
+        for u_id, i_id, rating in self.ratings.to_list():
+            rating_set[i_id].append(rating)
+            row_touch = touch_matrix[u_id].tolist()
+            touch_set[i_id].append(row_touch)
+        return rating_set, touch_set
+
     @classmethod
     def train_test_split(self,dataset,test_size=0.2):
         matrix_shape = dataset.matrix_shape()
