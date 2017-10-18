@@ -10,24 +10,12 @@ class TestUtility(unittest.TestCase):
         self.touch_list = utility.load_touch_file('cust_touchs')
         self.normal = utility.Normalization()
 
-    def test_log(self):
-        original_min = min(list(rating[2] for rating in self.rating_list))
-        original_max = max(list(rating[2] for rating in self.rating_list))
-        
+    def test_log(self):        
         R_list = self.normal.log(self.rating_list)
-        normal_min = min(list(rating[2] for rating in R_list))
-        normal_max = max(list(rating[2] for rating in R_list))
-        self.assertEqual(len(self.rating_list), len(R_list))
-        self.assertEqual(normal_min, 0.)
-        self.assertEqual(normal_max, 1.)
-
         R_list = self.normal.log_revert(R_list)
-        revert_min = min(list(rating[2] for rating in R_list))
-        revert_max = max(list(rating[2] for rating in R_list))
-        self.assertEqual(len(self.rating_list), len(R_list))
-        self.assertTrue( (revert_min - original_min) <0.00001)
-        self.assertTrue( (revert_max - original_max) <0.00001) 
-    
+        for r_id in range(len(R_list)):
+            self.assertEqual(R_list[r_id], self.rating_list[r_id]) 
+        
     def test_minmax(self):
         original_min = min(list(rating[2] for rating in self.rating_list))
         original_max = max(list(rating[2] for rating in self.rating_list))

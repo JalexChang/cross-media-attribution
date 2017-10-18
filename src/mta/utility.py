@@ -32,15 +32,14 @@ class Normalization:
 	
 	def __init__(self):
 		self.min_element = 0.
-		self.max_element = 0.
+		self.max_element = 1.
 
 	def log(self, R_list):
 		for index in range(len(R_list)):
 			R_list[index][2] = math.log(R_list[index][2])
-		return self.minmax(R_list)
+		return R_list
 
 	def log_revert(self, R_list):
-		R_list = self.minmax_revert(R_list)
 		for index in range(len(R_list)):
 			R_list[index][2] = math.exp(R_list[index][2])
 		return R_list
