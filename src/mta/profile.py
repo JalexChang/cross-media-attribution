@@ -38,7 +38,7 @@ class Profile:
         labels = self._make_labels(stacks, stack_range)
         return dist, labels
 
-    #get the distribution of number of touched factors in each items 
+    #get the distribution of the number of touched factor in each items 
     @classmethod
     def factor_dist_on_items(self, dataset,  stacks=21, stack_range=1):
         item_size = dataset.matrix_shape()[2]
@@ -68,7 +68,7 @@ class Profile:
         labels = self._make_labels(stacks, stack_range)
         return dist, labels
 
-    #get the distribution of number of products in each factors
+    #get the distribution of the number of item in each factors
     @classmethod
     def item_dist_on_factors(self, dataset, stacks=11, stack_range=10):
         item_size = dataset.matrix_shape()[2]
@@ -84,6 +84,17 @@ class Profile:
             factor_num_items[f_id] = factor_item_table[f_id].sum()
 
         dist = self._make_dist(factor_num_items, stacks, stack_range)
+        labels = self._make_labels(stacks, stack_range)
+        return dist, labels
+
+    #get the distribution of the number of item in each users
+    @classmethod
+    def item_dist_on_users(self, dataset, stacks=11, stack_range=10):
+        user_size = dataset.matrix_shape()[0]
+        user_num_items = numpy.zeros(user_size, dtype=int)
+        for u_id, i_id, rating in dataset.ratings.to_list():
+            user_num_items[u_id]+=1
+        dist = self._make_dist(user_num_items, stacks, stack_range)
         labels = self._make_labels(stacks, stack_range)
         return dist, labels
         

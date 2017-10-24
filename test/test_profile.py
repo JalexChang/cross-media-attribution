@@ -46,5 +46,11 @@ class TestProfile(unittest.TestCase):
         self.assertEqual(len(dist),6)
         self.assertEqual(dist.tolist(),[0, 0, 0, 1, 0, 2])
 
+    def test_item_dist_on_users(self):
+        dist, labels = Profile.item_dist_on_users(self.dataset, stacks=6, stack_range=1)
+        self.assertEqual(len(labels),6)
+        self.assertEqual(len(dist),6)
+        self.assertEqual(dist.tolist(),[0, 0, 2, 3, 0, 0])
+
 if __name__ == '__main__' :
     unittest.main()
