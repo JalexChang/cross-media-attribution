@@ -13,6 +13,11 @@ class TestMetric(unittest.TestCase):
         self.assertIsInstance(rmse,float)
         self.assertTrue(rmse <= 0.26)
 
+    def test_mse(self):
+        mse = metric.mse(self.rating_list, self.predicted_matrix)
+        self.assertIsInstance(mse,float)
+        self.assertTrue(mse <= 0.0676)
+
     def test_mae(self):
         mae = metric.mae(self.rating_list, self.predicted_matrix)
         self.assertIsInstance(mae,float)
@@ -22,6 +27,12 @@ class TestMetric(unittest.TestCase):
         mape = metric.mape(self.rating_list, self.predicted_matrix)
         self.assertIsInstance(mape,float)
         self.assertTrue(mape <= 27.55)
+
+    def test_R2(self):
+        r2 = metric.R2(self.rating_list, self.predicted_matrix)
+        self.assertIsInstance(r2,float)
+        self.assertTrue(r2 <=1)
+        self.assertTrue(r2 >0)
 
     def test_hit_rate(self):
         hit_rate_1 = metric.hit_rate_1(self.rating_list, self.predicted_matrix)
