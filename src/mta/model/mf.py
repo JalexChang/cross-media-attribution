@@ -167,9 +167,9 @@ class MF:
         if R_list is None:
             R_list = self.ratings.to_list() 
         for u_id, i_id, rating in R_list:
+            total_weight = numpy.inner(self.W[u_id,:], self.H[:,i_id])
             for f_id in range(self._size_factor):
-                total_weight = R_predicted[u_id][i_id] -self.mean -self.bias_user[u_id] -self.bias_item[i_id]
-                attributed_weight = self.W[u_id][f_id] * self.H[f_id][i_id]
-                if total_weight > 0.:
+                attributed_weight = self.W[u_id][f_id] * self.H[f_id][i_id] 
+                if total_weight != 0.:
                     attribution_matrix[f_id][i_id] += rating * (attributed_weight / total_weight)
         return attribution_matrix
