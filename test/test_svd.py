@@ -38,7 +38,7 @@ class TestSVD(unittest.TestCase):
 
         rmse = metric.rmse(self.dataset.ratings.to_list(),predict_rating)
         print("rmse", rmse)
-        self.assertTrue(rmse <= 1.5)
+        self.assertTrue(rmse <= 2)
 
     def test_factor_item_attribution(self):
         self.model.fit()
