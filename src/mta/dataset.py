@@ -20,7 +20,7 @@ class Dataset:
 
     def _construct_matrix_shape(self,rating_rows,touch_rows,matrix_shape=None):
         if matrix_shape is None:
-            self._size_user = int(max(list( int(rating[0]) for rating in rating_rows )))+1
+            self._size_user = int(max(list( int(touch[0]) for touch in touch_rows )))+1
             self._size_item = int(max(list( int(rating[1]) for rating in rating_rows )))+1
             self._size_factor = int(max(list( int(touch[1]) for touch in touch_rows )))+1
         else:
