@@ -85,6 +85,15 @@ class CrossValidation:
         elif score_type =="avg":
             return self._model_folds[fold_id].predict_average(rating_list)
 
+    def predict(self):
+        matrix_pred = numpy.zeros(self.dataset.ratings.matrix_shape())
+        for index in range(len(self._model_folds)):
+            rating_list = self._dataset_folds[index].ratings.to_list()
+            pred_ratings = self._get_predictions(index, rating_list, "normal")
+            for u_id, i_id, rating in rating_list:
+                matrix_pred[u_id][i_id] += pred_ratings[u_id][i_id]
+        return matrix_pred 
+        
     def select(self,metirc_func):
         scores = self.score(metirc_func)
         min_score = min(scores)
