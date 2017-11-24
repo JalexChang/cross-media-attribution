@@ -163,7 +163,6 @@ class MF:
 
     def factor_item_attribution(self, R_list = None):
         attribution_matrix = numpy.zeros([self._size_factor,self._size_item])
-        R_predicted = self.predict()
         if R_list is None:
             R_list = self.ratings.to_list() 
         for u_id, i_id, rating in R_list:
