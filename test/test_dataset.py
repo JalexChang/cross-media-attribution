@@ -42,6 +42,12 @@ class TestDataSet(unittest.TestCase):
         for i_id in range(len(rating_set)):
             self.assertEqual(len(rating_set[i_id]), len(touch_set[i_id]))
 
+    def test_flatten_rating_touch(self):
+        rating_set , feature_set = self.dataset.flatten_rating_touch()
+        self.assertEqual(len(rating_set), len(feature_set))
+        print (feature_set)
+        print (rating_set)
+
     def test_train_test_split(self):
         train_dataset,test_dataset = Dataset.train_test_split(self.dataset,test_size=0.5)
         self.assertEqual(train_dataset.matrix_shape(),test_dataset.matrix_shape())

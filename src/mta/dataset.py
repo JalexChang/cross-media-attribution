@@ -20,7 +20,7 @@ class Dataset:
 
     def _construct_matrix_shape(self,rating_rows,touch_rows,matrix_shape=None):
         if matrix_shape is None:
-            self._size_user = int(max(list( int(touch[0]) for touch in touch_rows )))+1
+            self._size_user = max(int(max(list( int(touch[0]) for touch in touch_rows ))),int(max(list( int(rating[0]) for rating in rating_rows ))))+1
             self._size_item = int(max(list( int(rating[1]) for rating in rating_rows )))+1
             self._size_factor = int(max(list( int(touch[1]) for touch in touch_rows )))+1
         else:
@@ -59,6 +59,24 @@ class Dataset:
             row_touch = touch_matrix[u_id].tolist()
             touch_set[i_id].append(row_touch)
         return rating_set, touch_set
+
+    #convert dataset into (F+I)-D reresion dataset  
+    def flatten_rating_touch(self):
+        size_feature  = self._size_factor + self._size_item
+        touch_matrix = self.touchs.to_matrix()
+
+        feature_set = []
+        rating_set= []
+        for u_id, i_id, rating in self.ratings.to_list():
+            rating_set.append(rating)
+            features = numpy.zeros(size_feature, dtype = int)
+            features[self._size_factor+ i_id] = 1
+            for f_id in range(self._size_factor):
+                features[f_id] = touch_matrix[u_id][f_id]
+            feature_set.append(features.tolist())
+
+        return rating_set, feature_set
+
 
     @classmethod
     def train_test_split(self,dataset,test_size=0.2):
